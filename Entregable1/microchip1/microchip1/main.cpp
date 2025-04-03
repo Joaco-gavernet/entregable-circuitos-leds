@@ -32,30 +32,29 @@ unsigned char three[] = {
 int main(void)
 {
 	
-  DDRC = ~(1<<PORTC0) & ~(1<<PORTC1); //Configuracion de entrada
-  PORTC |= (1 << PC0) | (1 << PC1); //Configuracion Pull-up C0 y C1 (1 ~ default)
+  DDRC = ~(1<<PORTC0) & ~(1<<PORTC1); //Configuracion de PORT C como entrada
+  PORTC |= (1 << PC0) | (1 << PC1); //Configuracion Pull-up C0 y C1 
 
-// Configuracion de SALIDA	
-  DDRD = 0xFF; 
-  DDRB = (1<<PORTC0) | (1<<PORTC1);
-
+  DDRD = 0xFF; //Configuracion PORT D como salida
+  DDRB = (1<<PORTB3) | (1<<PORTB4); //Configuracion PB4 y PB3 como salida
 
   unsigned char act = 0, i = 0; 
   while(1){
-    if (!(PINC & (1<<PINC0))) { //entra al if cuando pinc0 esra en 0 debido al pull up
+    if (!(PINC & (1<<PINC0))) { //Chequeo pulsador (C0) y actualizacion de secuencia
 		act++; 
 		act %= 3; 
 		i = 0; 
 		_delay_ms(100); //Delay de debounce: Un pulso cambia una unica secuencia
 	}
-    if (!(PINC & (1<<PINC1))) {//entra al if cuando pinc1 esta en 0 debido al pull up
+    if (!(PINC & (1<<PINC1))) {//Chequeo pulsador (C1) y muestra de secuencia
       if ((act + 1) & 1) PORTB |= (1<<3);  
       if ((act + 1) & 2) PORTB |= (1<<4); 
     } else {
-      PORTB &= ~(1<<3);  //cuando no esta pulsado apago con 1 (salida)
+      PORTB &= ~(1<<3);  //Si no esta pulsado mantenemos B3 y B4 apagados
       PORTB &= ~(1<<4); 
     } 
 
+	// Cambios de estados/secuencias
     if (act == 0) PORTD = one[i], ++i, i %= 2; 
     else if (act == 1) PORTD = two[i], ++i, i %= 8; 
     else if (act == 2) PORTD = three[i], ++i, i %= 8; 

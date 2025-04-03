@@ -90,20 +90,19 @@ Disassembly of section .text:
 int main(void)
 {
 	
-  DDRC = ~(1<<PORTC0) & ~(1<<PORTC1); //Configuracion de entrada
+  DDRC = ~(1<<PORTC0) & ~(1<<PORTC1); //Configuracion de PORT C como entrada
   96:	8c ef       	ldi	r24, 0xFC	; 252
   98:	87 b9       	out	0x07, r24	; 7
-  PORTC |= (1 << PC0) | (1 << PC1); //Configuracion Pull-up C0 y C1 (1 ~ default)
+  PORTC |= (1 << PC0) | (1 << PC1); //Configuracion Pull-up C0 y C1 
   9a:	88 b1       	in	r24, 0x08	; 8
   9c:	83 60       	ori	r24, 0x03	; 3
   9e:	88 b9       	out	0x08, r24	; 8
 
-// Configuracion de SALIDA	
-  DDRD = 0xFF; 
+  DDRD = 0xFF; //Configuracion PORT D como salida
   a0:	8f ef       	ldi	r24, 0xFF	; 255
   a2:	8a b9       	out	0x0a, r24	; 10
-  DDRB = (1<<PORTC0) | (1<<PORTC1);
-  a4:	83 e0       	ldi	r24, 0x03	; 3
+  DDRB = (1<<PORTB3) | (1<<PORTB4); //Configuracion 
+  a4:	88 e1       	ldi	r24, 0x18	; 24
   a6:	84 b9       	out	0x04, r24	; 4
 
 
