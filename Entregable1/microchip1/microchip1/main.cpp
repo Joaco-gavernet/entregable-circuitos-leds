@@ -31,26 +31,29 @@ unsigned char three[] = {
 
 int main(void)
 {
-  DDRC = ~(1<<PORTC0) & ~(1<<PORTC1); 
-  PORTC |= (1 << PC0) | (1 << PC1); //Configuracion Pull-up C0 y C1
+	
+  DDRC = ~(1<<PORTC0) & ~(1<<PORTC1); //Configuracion de entrada
+  PORTC |= (1 << PC0) | (1 << PC1); //Configuracion Pull-up C0 y C1 (1 ~ default)
 
-  DDRD = 0xFF; // Configura como salida
+// Configuracion de SALIDA	
+  DDRD = 0xFF; 
+  DDRB = (1<<PORTC0) | (1<<PORTC1);
 
 
   unsigned char act = 0, i = 0; 
   while(1){
-    if (!(PINC & (1<<PINC0))) {
+    if (!(PINC & (1<<PINC0))) { //entra al if cuando pinc0 esra en 0 debido al pull up
 		act++; 
 		act %= 3; 
 		i = 0; 
-		_delay_ms(100); 
+		_delay_ms(100); //Delay de debounce: Un pulso cambia una unica secuencia
 	}
-    if (!(PINC & (1<<PINC1))) {
-      if ((act + 1) & 1) PORTB |= (1<<3); 
+    if (!(PINC & (1<<PINC1))) {//entra al if cuando pinc1 esta en 0 debido al pull up
+      if ((act + 1) & 1) PORTB |= (1<<3);  
       if ((act + 1) & 2) PORTB |= (1<<4); 
     } else {
-      PORTB &= ~(1<<3); 
-      PORTB &= ~(1<<3); 
+      PORTB &= ~(1<<3);  //cuando no esta pulsado apago con 1 (salida)
+      PORTB &= ~(1<<4); 
     } 
 
     if (act == 0) PORTD = one[i], ++i, i %= 2; 
