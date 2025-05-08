@@ -1,0 +1,17 @@
+Guia directorio:
+- proteus.pdrsj: Archivo proteus.
+- microchip1/microchip1.atsln: Archivo microchip.
+- microchip1/microchip1/Debug/microchip1.elf: Archivo .elf ingresado al MCU en proteus.
+- microchip1/microchip1/main.cpp: Archivo con lógica cargada al MCU.
+
+Calculos y Consideraciones:
+- Conociendo la corriente maxima que puede circular por cada led (Imax = 10mA) y la tension de caida en los LED (verde) Vled = 2.2 V. Se calculo el valor de resistencia necesario para limitar la corriente:
+
+R >= 270 Ω -> Se eligio R = 330 Ω (valor comercial mas proximo a 270 Ω). Se verificaron estos resultados de forma practica con un amperímetro en serie a los LED's y la corriente no supera los 10mA máximos. 
+Ademas se verifico que la corriente total entregada por el MCU no supere la maxima (200 mA) (seccion 28.1) conectando un amperímetro al nodo común previo a GND. 
+
+- En el caso de los PUERTOS C0 y C1, se los configuro como entrada, con la configuración adicional de PULL-UP, ya que fueron conectados a GND. Logrando una entrada NH (normalmente alta).
+
+
+
+
