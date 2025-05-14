@@ -3,7 +3,7 @@ MCU=atmega328p
 F_CPU=16000000UL
 BAUD=115200
 PROGRAMMER=arduino
-PORT=/dev/tty.usbserial-120
+PORT=/dev/tty.usbserial-2130
 
 # === Tools ===
 CC=avr-gcc
@@ -16,7 +16,7 @@ DEP=$(SRC:.c=.d)
 TARGET=main
 
 # Add AVR-specific flags and includes
-CFLAGS=-mmcu=$(MCU) -DF_CPU=$(F_CPU) -Os -Wall -std=gnu11 -I/usr/local/avr/include -I/usr/avr/include
+CFLAGS=-mmcu=$(MCU) -DF_CPU=$(F_CPU) -Os -std=gnu11 -I/usr/local/avr/include -I/usr/avr/include
 LDFLAGS=-mmcu=$(MCU)
 
 # === Rules ===

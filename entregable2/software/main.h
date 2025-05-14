@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
-#define LONGITUD_PALABRA 5  
 
+// Librerias estandares
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <util/delay.h>
@@ -9,15 +9,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <avr/interrupt.h>
 
-    
+// Librerias propias
+#include "lcd.h"
+#include "teclado4x4.h"
+#include "Seos.h"
+#include "Juego.h"
 
-// Common port definitions
-#define KEYPAD_PORT PORTC
-#define KEYPAD_DDR  DDRC
-#define KEYPAD_PIN  PINC
 
-// Common timing definitions
-#define DEBOUNCE_TIME 20  // milliseconds
+#define LONGITUD_PALABRA 5
+#define NUM_PALABRAS 25
 
 #endif
