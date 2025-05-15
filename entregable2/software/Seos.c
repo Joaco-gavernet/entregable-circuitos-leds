@@ -16,7 +16,7 @@ void sEOS_Init_Timer(uint16_t period)
 
 void sEOS_Dispatch_Tasks (void) {
     // actualizar MEF cada 100 ms
-    if ( MEF_flag) {
+    if (MEF_flag) {
         MEF_flag = 0;
         JUEGO_Update(); // MEF
     }
