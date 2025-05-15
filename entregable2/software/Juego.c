@@ -67,7 +67,7 @@ void JUEGO_Update(void) {
                 LCDsendChar(key);
                 x++;
 
-                if(key == '#') {
+                if(key == '#' || (accumulated_number > 122)) {
                     caracter_ingresado = accumulated_number;
                     System_state = VERIFY_PASSWORD;
                     accumulated_number = 0;  // Reset para proximo caracter
