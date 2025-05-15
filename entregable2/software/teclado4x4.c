@@ -7,12 +7,18 @@ const uint8_t keymap[4][4] = {
     {'*','0','#','D'}
 };
 
+/***************************************************************
+* Propósito de la función: Escanea el teclado 4x4. Si se detecta una tecla presionada, se devuelve el carácter correspondiente por *key y retorna 1. Si no, *key = 0xFF y retorna 0.
+* Parámetros de entrada (tipo, rango y formato): uint8_t *key (puntero donde se almacena la tecla detectada)
+* Parámetros de salida (tipo, rango y formato): uint8_t (1 si hay tecla, 0 si no)
+* Macros y su significado: 
+*   - DDRD, DDRB: Configuración de pines como entrada/salida
+*   - PORTD, PORTB: Escritura de valores en pines
+*   - PIND: Lectura del estado de los pines
+*   - PORTD2, PORTD3, PORTD4, PORTD5, PORTD7, PORTB0, PORTB3, PORTB4: Pines usados para filas y columnas
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+***************************************************************/
 uint8_t KeypadUpdate(uint8_t *key) {
-    /*
-     * Escanea el teclado 4x4. Si se detecta una tecla presionada, se devuelve
-     * el carácter correspondiente por *key y retorna 1. Si no, *key = 0xFF y retorna 0.
-     */
-
     // Configurar columnas como entrada con pull-up (PD2–PD5)
     DDRD &= ~(1 << PORTD2 | 1 << PORTD3 | 1 << PORTD4 | 1 << PORTD5 | 1 << PORTD7);  // PD7 también es entrada
     DDRB &= ~(1 << PORTB0 | 1 << PORTB3 | 1 << PORTB4); // Filas como entrada momentáneamente
@@ -47,13 +53,14 @@ uint8_t KeypadUpdate(uint8_t *key) {
     return 0;
 }
 
+/***************************************************************
+* Propósito de la función: Aplica doble verificación para evitar detecciones múltiples por rebote. Si se detecta una nueva tecla, retorna 1 y guarda el valor en *pkey. Si no hay tecla presionada, retorna 0.
+* Parámetros de entrada (tipo, rango y formato): uint8_t *pkey (puntero donde se almacena la tecla detectada)
+* Parámetros de salida (tipo, rango y formato): uint8_t (1 si hay tecla, 0 si no)
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+* Otros comentarios: Fecha y log de modificaciones, etc
+***************************************************************/
 uint8_t KEYPAD_Scan(uint8_t *pkey) {
-    /*
-     * Aplica doble verificación para evitar detecciones múltiples por rebote.
-     * Si se detecta una nueva tecla, retorna 1 y guarda el valor en *pkey.
-     * Si no hay tecla presionada, retorna 0.
-     */
-
     static uint8_t old_key = 0xFF;
     static uint8_t last_valid_key = 0xFF;
     uint8_t current_key;
@@ -78,6 +85,15 @@ uint8_t KEYPAD_Scan(uint8_t *pkey) {
     return 0;
 }
 
+/***************************************************************
+* Propósito de la función: Detecta si se presionó la tecla '*', útil para iniciar el juego.
+* Parámetros de entrada (tipo, rango y formato): Ninguno
+* Parámetros de salida (tipo, rango y formato): uint8_t (1 si se presionó '*', 0 si no)
+* Macros y su significado: 
+*   - KEYPAD_Scan: Función auxiliar para escanear el teclado
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+* Otros comentarios: Fecha y log de modificaciones, etc
+***************************************************************/
 uint8_t KEYPAD_get_init(void) {
     uint8_t key; 
     if (KEYPAD_Scan(&key)) {

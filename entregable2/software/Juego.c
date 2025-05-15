@@ -12,8 +12,26 @@ static eSystem_state System_state;
 char * palabras [] = {"Arbol", "Boton", "CDyMC", "ClavE", "Facil", "Gafas", "Hojas", "LiBro", "Lanza", "Nieve", "PeRro", "PecES", "PiAno", "PrYKe", "RUEDa",
 "SERIE", "SalUd", "Salud", "Silla", "Tecla", "Valor", "Verde", "YnHRz", "hARdD", "silla"};
 
+/***************************************************************
+* Propósito de la función: Genera un índice aleatorio para seleccionar
+*   una palabra de la lista.
+* Parámetros de entrada (tipo, rango y formato): Ninguno
+* Parámetros de salida (tipo, rango y formato): uint8_t, valor entre 0 y NUM_PALABRAS-1
+* Condiciones de Error de la función (poner ejemplos si hace falta): Ninguna
+* Macros y su significado: srand, rand, NUM_PALABRAS
+* Otros comentarios: Autor, fecha y log de modificaciones, etc
+***************************************************************/
 static uint8_t random_index(void) { srand(State_call_count); return rand() % NUM_PALABRAS; }  // Helper: Indice aleatorio de la lista de palabras
 
+/***************************************************************
+* Propósito de la función: Inicializa el juego, limpia la pantalla
+*   y muestra el mensaje de inicio.
+* Parámetros de entrada (tipo, rango y formato): Ninguno
+* Parámetros de salida (tipo, rango y formato): Ninguno
+* Condiciones de Error de la función (poner ejemplos si hace falta): Ninguna
+* Macros y su significado: LCDclr, LCDGotoXY, LCDstring
+* Otros comentarios: Autor, fecha y log de modificaciones, etc
+***************************************************************/
 void JUEGO_Init(void) {
     LCDclr();
     LCDGotoXY(0, 0);
@@ -21,6 +39,15 @@ void JUEGO_Init(void) {
     System_state = INIT;
 }
 
+/***************************************************************
+* Propósito de la función: Actualiza el estado del juego según la
+*   máquina de estados finitos (MEF), gestiona la lógica principal.
+* Parámetros de entrada (tipo, rango y formato): Ninguno
+* Parámetros de salida (tipo, rango y formato): Ninguno
+* Condiciones de Error de la función (poner ejemplos si hace falta): Ninguna
+* Macros y su significado: LCDclr, LCDGotoXY, LCDstring, LCDsendChar, KEYPAD_Scan, etc.
+* Otros comentarios: Autor, fecha y log de modificaciones, etc
+***************************************************************/
 void JUEGO_Update(void) {
     State_call_count++;  // Numero de interrupciones totales  
     uint8_t key;         // Lecturas de teclado
