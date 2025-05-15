@@ -30,6 +30,10 @@ uint8_t KeypadUpdate(uint8_t *key) {
     PORTD &= ~(1 << PORTD7);
 
     for (uint8_t row = 0; row < 4; row++) {
+        // Desactivar filas
+        DDRD &= ~(1 << PORTD7);
+        DDRB &= ~(1 << PORTB0 | 1 << PORTB3 | 1 << PORTB4);
+
         // Activar solo la fila correspondiente como salida
         switch (row) {
             case 0: DDRB |= (1 << PORTB4); break; // Fila 0
@@ -37,10 +41,7 @@ uint8_t KeypadUpdate(uint8_t *key) {
             case 2: DDRB |= (1 << PORTB0); break; // Fila 2
             case 3: DDRD |= (1 << PORTD7); break; // Fila 3
         }
-
-        // Desactivar filas
-        DDRD &= ~(1 << PORTD7);
-        DDRB &= ~(1 << PORTB0 | 1 << PORTB3 | 1 << PORTB4);
+        *key = 0xFF;
 
         // Lectura de columnas
         if (!(PIND & (1 << PORTD5))) { *key = keymap[row][1]; return 1; } // Columna 1
@@ -49,7 +50,6 @@ uint8_t KeypadUpdate(uint8_t *key) {
         if (!(PIND & (1 << PORTD2))) { *key = keymap[row][3]; return 1; } // Columna 3
     }
 
-    *key = 0xFF;
     return 0;
 }
 

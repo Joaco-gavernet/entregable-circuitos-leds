@@ -106,7 +106,14 @@ void JUEGO_Update(void) {
                     x = 0;
                     LCDclearline(1);
                 }
-                else if(key >= '0' && key <= '9') accumulated_number = (accumulated_number * 10) + (key - '0');  // Acumulamos ASCII ingresado
+                else if(key >= '0' && key <= '9') {
+                    if (accumulated_number == 0 && key == '0') {
+                        LCDclearline(1);
+                        LCDGotoXY(0,1);
+                        x = 0; 
+                    }
+                    accumulated_number = (accumulated_number * 10) + (key - '0');  // Acumulamos ASCII ingresado
+                }
             }   
             break;
         case VERIFY_PASSWORD:
@@ -136,7 +143,7 @@ void JUEGO_Update(void) {
                 char time_str[6];
                 sprintf(time_str, "%u", (uint16_t)((State_call_count - start)*PERIODO_MEF));
                 LCDstring(time_str, strlen(time_str));
-                LCDstring("ms", 2);                _delay_ms(5000);
+                LCDstring("ms", 2);
             }
             else if(count == 50) {  // Delay de 5000ms (50Ts)
                 LCDclr();
