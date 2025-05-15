@@ -85,6 +85,8 @@ void JUEGO_Update(void) {
             else if(count >= 20) {
                 start = State_call_count;
                 LCDclr(); 
+                LCDGotoXY(13, 0);
+                LCDstring("***", 3);
                 LCDGotoXY(0, 1);
                 System_state = INPUT_PASSWORD;
             }
@@ -113,7 +115,11 @@ void JUEGO_Update(void) {
                 LCDsendChar(caracter_ingresado);
                 correct++;
             }
-            else incorrect++;
+            else {
+                LCDGotoXY(13 + incorrect++, 0);
+                LCDsendChar(' '); 
+                LCDGotoXY(0,1); 
+            }
             caracter_ingresado = 0;  
 
             if(correct == LONGITUD_PALABRA) {System_state = WIN;}
