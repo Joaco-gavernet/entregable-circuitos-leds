@@ -21,3 +21,12 @@ void sEOS_Dispatch_Tasks (void) {
         JUEGO_Update(); // MEF
     }
 }
+
+/* ISR para actualizar la MEF cada 10 ISR */
+ISR(TIMER0_COMPA_vect) 
+{
+    if (++cont_MEF == 20) {  
+        MEF_flag = 1;
+        cont_MEF = 0;
+    }
+}
