@@ -20,5 +20,6 @@
 
 #define LONGITUD_PALABRA 5
 #define NUM_PALABRAS 25
+#define ERROR_MAX 3
 
 #endif
