@@ -375,6 +375,12 @@ void LCD_Init() {
 	LCDhome();
 }
 
+void LCDclearline(uint8_t y) {
+	LCDGotoXY(0, y);
+	LCDstring("                ", 16);
+	LCDGotoXY(0, y);
+}
+
 /*
 void LCD_Update(){
 	char Temp_string[] = "Temp: 00.0 C"; //Preparo la cadena de string a mostrar en el LCD

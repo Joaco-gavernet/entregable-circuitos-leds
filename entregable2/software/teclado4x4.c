@@ -1,5 +1,3 @@
-#include <avr/io.h>
-#include <string.h>
 #include "teclado4x4.h"
 
 const uint8_t keymap[4][4] = {

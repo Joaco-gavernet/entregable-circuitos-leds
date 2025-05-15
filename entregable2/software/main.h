@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <avr/interrupt.h>
+#include <string.h>
 
 // Librerias propias
 #include "lcd.h"
@@ -21,5 +22,7 @@
 #define LONGITUD_PALABRA 5
 #define NUM_PALABRAS 25
 #define ERROR_MAX 3
+#define MEF_LIMIT 10
+#define COMPARE_CLOCK_VALUE 155 
 
 #endif
