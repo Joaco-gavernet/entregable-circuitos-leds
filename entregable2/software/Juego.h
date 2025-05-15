@@ -8,7 +8,7 @@
 // External declarations for variables used across files
 extern volatile uint8_t MEF_flag;
 extern volatile uint8_t cont_MEF;
-uint8_t volatile State_call_count;
+uint16_t volatile State_call_count;
 
 /* Funcion helper para obtener un indice aleatorio de la lista de palabras */
 static uint8_t random_index(void);
