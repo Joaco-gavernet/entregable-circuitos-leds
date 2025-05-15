@@ -24,5 +24,6 @@
 #define ERROR_MAX 3
 #define MEF_LIMIT 10
 #define COMPARE_CLOCK_VALUE 155 
+#define PERIODO_MEF 100
 
 #endif
