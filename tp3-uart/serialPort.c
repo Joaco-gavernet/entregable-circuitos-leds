@@ -1,16 +1,31 @@
-/*
- * serialPort.c
- *
- * Created: 07/10/2020 03:02:18 p. m.
- *  Author: vfperri
- */ 
+#include "serialPort.h"
 
-#include "SerialPort.h"
+// Buffer definitions
+volatile uint8_t tx_buffer[TX_BUFFER_SIZE];
+volatile uint8_t rx_buffer[RX_BUFFER_SIZE];
+volatile uint8_t tx_head = 0;
+volatile uint8_t tx_tail = 0;
+volatile uint8_t rx_head = 0;
+volatile uint8_t rx_tail = 0;
 
-// ------ Definiciones de Funciones P鷅licas -------------------
+// Command processing state
+typedef enum {
+	IDLE,
+	WAITING_FOR_COMMAND,
+	PROCESSING_COMMAND
+} State_t;
 
-// Inicializaci髇 de Puerto Serie
+static volatile State_t currentState = IDLE;
+static volatile uint8_t receivedCommand = 0;
+static volatile uint8_t commandProcessed = 1;  // Start as processed to allow new commands
 
+// Function prototypes
+static void processCommand(uint8_t cmd);
+static void sendResponse(const char* response);
+
+// ------ Definiciones de Funciones P煤blicas -------------------
+
+// Inicializaci贸n de Puerto Serie
 void SerialPort_Init(uint8_t config){
 	// config = 0x33 ==> Configuro UART 9600bps, 8 bit data, 1 stop @ F_CPU = 8MHz.
 	// config = 0x25 ==> Configuro UART 9600bps, 8 bit data, 1 stop @ F_CPU = 4Hz.
@@ -20,29 +35,20 @@ void SerialPort_Init(uint8_t config){
 	UBRR0L = (unsigned char)config;
 }
 
-
-// Inicializaci髇 de Transmisor
-
+// Inicializaci贸n de Transmisor
 void SerialPort_TX_Enable(void){
 	UCSR0B |= (1<<TXEN0);
 }
 
 void SerialPort_TX_Interrupt_Enable(void){
 	UCSR0B |= (1<<UDRIE0);
-	//UCSR0B |=(1<<TXCIE0); //interrupcion TXC
-
 }
 
-void SerialPort_TX_Interrupt_Disable(void)
-{
-	UCSR0B &=~(1<<UDRIE0);
-	//UCSR0B &=~(1<<TXCIE0); //interrupcion TXC
-
+void SerialPort_TX_Interrupt_Disable(void){
+	UCSR0B &= ~(1<<UDRIE0);
 }
 
-
-// Inicializaci髇 de Receptor
-
+// Inicializaci贸n de Receptor
 void SerialPort_RX_Enable(void){
 	UCSR0B |= (1<<RXEN0);
 }
@@ -51,56 +57,66 @@ void SerialPort_RX_Interrupt_Enable(void){
 	UCSR0B |= (1<<RXCIE0);
 }
 
-
-// Transmisi髇
-
-// Espera hasta que el buffer de TX este libre.
-void SerialPort_Wait_For_TX_Buffer_Free(void){
-	// Pooling - Bloqueante hasta que termine de transmitir.
+void SerialPort_Wait_For_TX_Buffer_Free(void) {
 	while(!(UCSR0A & (1<<UDRE0)));
 }
 
+// Transmisi贸n
 void SerialPort_Send_Data(char data){
+	SerialPort_Wait_For_TX_Buffer_Free();
 	UDR0 = data;
 }
 
-void SerialPort_Send_String(char * msg){ //msg -> "Hola como andan hoy?" 20 ASCII+findecadena, tardo=20ms
-	uint8_t i = 0;
-	//'\0' = 0x00
-	while(msg[i]){ // *(msg+i)
-		SerialPort_Wait_For_TX_Buffer_Free(); //9600bps formato 8N1, 10bits, 10.Tbit=10/9600=1ms 
-		SerialPort_Send_Data(msg[i]);
-		i++;
+void SerialPort_Send_String(char * msg){
+	while(*msg){
+		SerialPort_Send_Data(*msg++);
 	}
 }
 
-
-// Recepci髇
-
-// Espera hasta que el buffer de RX este completo.
-void SerialPort_Wait_Until_New_Data(void){
-	// Pooling - Bloqueante, puede durar indefinidamente!
-	while(!(UCSR0A & (1<<RXC0)));
+// Reception
+char SerialPort_Receive_Data(void){
+	uint8_t data;
+	
+	// Wait until there's data in the buffer
+	while(rx_head == rx_tail);
+	
+	data = rx_buffer[rx_tail];
+	rx_tail = (rx_tail + 1) % RX_BUFFER_SIZE;
+	
+	return data;
 }
 
-
-char SerialPort_Recive_Data(void){
-	return UDR0;
+// Interrupt Service Routines
+ISR(USART_RX_vect){
+	uint8_t received = UDR0;
+	
+	// Only process new commands if we're ready
+	if (commandProcessed) {
+		receivedCommand = received;
+		commandProcessed = 0;
+		currentState = WAITING_FOR_COMMAND;
+	}
 }
 
+ISR(USART_UDRE_vect){
+	if(tx_head != tx_tail){
+		UDR0 = tx_buffer[tx_tail];
+		tx_tail = (tx_tail + 1) % TX_BUFFER_SIZE;
+	} else {
+		// Buffer empty, disable interrupt
+		UCSR0B &= ~(1<<UDRIE0);
+	}
+}
 
 void SerialPort_Send_uint8_t(uint8_t num){
-	
 	SerialPort_Wait_For_TX_Buffer_Free();
-	SerialPort_Send_Data('0'+num/100);
-	
-	num-=100;
-	
+	SerialPort_Send_Data('0' + (num/100));
+	num %= 100;
 	SerialPort_Wait_For_TX_Buffer_Free();
-	SerialPort_Send_Data('0'+num/10);
-	
+	SerialPort_Send_Data('0' + (num/10));
+	num %= 10;
 	SerialPort_Wait_For_TX_Buffer_Free();
-	SerialPort_Send_Data('0'+ num%10);
+	SerialPort_Send_Data('0' + num);
 }
 
 /***************************************************************
@@ -136,3 +152,41 @@ void SerialPort_send_int16_t(int val,unsigned int field_length)
 	}
 }
 
+// Process received commands
+static void processCommand(uint8_t cmd) {
+	switch(cmd) {
+		case '1':
+			sendResponse("Command 1 received\r\n");
+			break;
+		case '2':
+			sendResponse("Command 2 received\r\n");
+			break;
+		case '3':
+			sendResponse("Command 3 received\r\n");
+			break;
+		case 'h':
+			sendResponse("Available commands:\r\n");
+			sendResponse("1 - Command 1\r\n");
+			sendResponse("2 - Command 2\r\n");
+			sendResponse("3 - Command 3\r\n");
+			sendResponse("h - Help\r\n");
+			break;
+		default:
+			sendResponse("Unknown command\r\n");
+			break;
+	}
+}
+
+// Send response through UART
+static void sendResponse(const char* response) {
+	SerialPort_Send_String((char*)response);
+}
+
+// Main processing function to be called from main loop
+void SerialPort_Process(void) {
+	if (!commandProcessed && currentState == WAITING_FOR_COMMAND) {
+		processCommand(receivedCommand);
+		commandProcessed = 1;
+		currentState = IDLE;
+	}
+}
