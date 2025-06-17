@@ -11,6 +11,12 @@ volatile uint8_t led_state = 0;  // 0 = OFF, 1 = ON
 volatile uint8_t current_mode = 0;  // 0 = Command Mode, 1 = Data Mode
 volatile uint8_t mode_change_requested = 0;
 
+// Timer and alarm variables
+volatile uint8_t timer_flag_1s = 0;
+
+// RTC time variables
+volatile uint8_t h, m, s;
+
 void uart_setup(void) {
   SerialPort_Init(0x33);
   SerialPort_RX_Enable();
@@ -157,12 +163,14 @@ int main(void) {
                 }
             }
             if (rtc_data_ready) {
-                rtc_get_time(&h, &m, &s);
+                // rtc_get_time(&h, &m, &s);
                 // TODO: Enviar hora por UART
                 rtc_start_read(); // Reiniciar lectura para el siguiente segundo
             }
 
         }
     }
+  }
+
   return 0;
 }
