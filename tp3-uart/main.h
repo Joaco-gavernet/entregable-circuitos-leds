@@ -12,16 +12,8 @@
 #include <avr/pgmspace.h>
 #include <stdint.h>
 
-#define TX_BUFFER_SIZE 64
+#include "serialPort.h"
+
 #define RX_BUFFER_SIZE 64
-
-static volatile uint8_t tx_buffer[TX_BUFFER_SIZE];
-static volatile uint8_t rx_buffer[RX_BUFFER_SIZE];
-static volatile uint8_t tx_head = 0;
-static volatile uint8_t tx_tail = 0;
-static volatile uint8_t rx_head = 0;
-static volatile uint8_t rx_tail = 0;
-
-
 
 #endif
