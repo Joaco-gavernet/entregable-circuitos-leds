@@ -13,6 +13,7 @@
 #include <stdint.h>
 
 #include "serialPort.h"
+#include "rtc3231.h"
 #include <util/delay.h>
 #include <string.h>
 

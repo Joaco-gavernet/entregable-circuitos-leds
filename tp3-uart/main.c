@@ -107,24 +107,29 @@ void send_data_message(void) {
   else SerialPort_Send_String("OFF\n");
 }
 
-ISR(USART_RX_vect) {
-  char c = SerialPort_Recive_Data();
-
-  if (c == '\n' || c == '\r') {
-    if (rx_index > 0) {  // Only process if we have data
-      rx_buffer[rx_index] = '\0';     // End of string
-      message_ready = 1;
-    }
-    rx_index = 0;
-  } else if (rx_index < RX_BUFFER_SIZE - 1) {
-    rx_buffer[rx_index++] = c;
-  }
+// === Timer 1s para tareas cíclicas ===
+void timer1_init(void) {
+    TCCR1B |= (1 << WGM12);                  // CTC
+    OCR1A = 15624;                           // 1s @ 8MHz y prescaler 1024
+    TCCR1B |= (1 << CS12) | (1 << CS10);     // Prescaler 1024
+    TIMSK1 |= (1 << OCIE1A);                 // Enable compare interrupt
 }
+
+// === INT0 para interrupción del RTC ===
+void ext_int0_init(void) {
+    EICRA |= (1 << ISC01);   // Flanco descendente
+    EICRA &= ~(1 << ISC00);
+    EIMSK |= (1 << INT0);    // Habilitar INT0
+}
+
+
 
 int main(void) {
   uart_setup();
   led_setup();
-
+  ext_int0_init(); // Habilitar interrupción INT0 (ALARMA)
+  timer1_init(); // Inicializar interrupción de 1s para tareas periódicas
+  rtc_init(); // Inicializar RTC
   current_mode = 0;
 
   // Foreground/Background or event-driven architecture
@@ -134,14 +139,30 @@ int main(void) {
       if (message_ready) {
         message_ready = 0; 
         process_command((char*)rx_buffer);
-      }
+      } 
+      // Procesar comandos
+      // - rtc_set_time(h, m, s)
+      // - rtc_set_alarm(h, m, s)
+      // - rtc_clear_alarm_flag()
+      // - rtc_start_read()
     } else {
-      // Data Mode - send periodic data
-      // TO-DO: use this space to make the data reception from RTC, ONLY when activated
-      send_data_message();
-      _delay_ms(2000);
-    }
-  }
+      if (timer_flag_1s) {
+            timer_flag_1s = 0;
+            if (alarm_active) {
+                // TODO: Enviar ALARMA por UART
+                alarm_count++;
 
+                if (alarm_count >= 5) {
+                    alarm_active = 0; // detener alarma
+                }
+            }
+            if (rtc_data_ready) {
+                rtc_get_time(&h, &m, &s);
+                // TODO: Enviar hora por UART
+                rtc_start_read(); // Reiniciar lectura para el siguiente segundo
+            }
+
+        }
+    }
   return 0;
 }
