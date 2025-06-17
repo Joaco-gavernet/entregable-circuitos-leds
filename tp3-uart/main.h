@@ -13,6 +13,9 @@
 #include <stdint.h>
 
 #include "serialPort.h"
+#include <util/delay.h>
+#include <string.h>
+
 
 #define RX_BUFFER_SIZE 64
 

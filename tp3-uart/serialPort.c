@@ -1,15 +1,4 @@
-/*
- * serialPort.c
- *
- * Created: 07/10/2020 03:02:18 p. m.
- *  Author: vfperri
- */ 
-
 #include "serialPort.h"
-
-// ------ Definiciones de Funciones P�blicas -------------------
-
-// Inicializaci�n de Puerto Serie
 
 // void SerialPort_Init(uint8_t config){
 // 	// config = 0x33 ==> Configuro UART 9600bps, 8 bit data, 1 stop @ F_CPU = 8MHz.
@@ -33,8 +22,6 @@ void SerialPort_Init(uint8_t config){
 }
 
 
-// Inicializaci�n de Transmisor
-
 void SerialPort_TX_Enable(void){
 	UCSR0B |= (1<<TXEN0);
 }
@@ -50,9 +37,6 @@ void SerialPort_TX_Interrupt_Disable(void)
 	//UCSR0B &=~(1<<TXCIE0); //interrupcion TXC
 }
 
-
-// Inicializaci�n de Receptor
-
 void SerialPort_RX_Enable(void){
 	UCSR0B |= (1<<RXEN0);
 }
@@ -60,9 +44,6 @@ void SerialPort_RX_Enable(void){
 void SerialPort_RX_Interrupt_Enable(void){
 	UCSR0B |= (1<<RXCIE0);
 }
-
-
-// Transmisi�n
 
 // Espera hasta que el buffer de TX este libre.
 void SerialPort_Wait_For_TX_Buffer_Free(void){
@@ -84,20 +65,15 @@ void SerialPort_Send_String(char * msg){ //msg -> "Hola como andan hoy?" 20 ASCI
 	}
 }
 
-
-// Recepci�n
-
 // Espera hasta que el buffer de RX este completo.
 void SerialPort_Wait_Until_New_Data(void){
 	// Pooling - Bloqueante, puede durar indefinidamente!
 	while(!(UCSR0A & (1<<RXC0)));
 }
 
-
 char SerialPort_Recive_Data(void){
 	return UDR0;
 }
-
 
 void SerialPort_Send_uint8_t(uint8_t num){
 	
