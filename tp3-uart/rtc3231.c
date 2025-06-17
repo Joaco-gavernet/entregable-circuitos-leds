@@ -18,6 +18,7 @@ void rtc_init(void) {
 void rtc_start_read(void) {
     if (rtc_state != RTC_IDLE) return;
     rtc_state = RTC_START;
+    rtc_current_op = RTC_OP_READ; 
     rtc_data_ready = 0;
     TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 }

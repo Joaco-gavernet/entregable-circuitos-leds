@@ -3,18 +3,10 @@
 volatile char rx_buffer[RX_BUFFER_SIZE];
 volatile uint8_t rx_index = 0;
 volatile uint8_t message_ready = 0;
-
-// LED control variables
 volatile uint8_t led_state = 0;  // 0 = OFF, 1 = ON
-
-// State machine variables
 volatile uint8_t current_mode = 0;  // 0 = Command Mode, 1 = Data Mode
 volatile uint8_t mode_change_requested = 0;
-
-// Timer and alarm variables
 volatile uint8_t timer_flag_1s = 0;
-
-// RTC time variables
 volatile uint8_t h, m, s;
 
 void uart_setup(void) {
@@ -65,6 +57,7 @@ void process_command(char* command) {
     led_on();
     switch_to_data_mode();
     SerialPort_Send_String("LED turned ON\n");
+    rtc_start_read(); 
     switch_to_command_mode();
   } else if (strcmp(command, "0") == 0) {
     led_off();
@@ -128,7 +121,9 @@ void ext_int0_init(void) {
     EIMSK |= (1 << INT0);    // Habilitar INT0
 }
 
-
+uint8_t bcd_to_decimal(uint8_t bcd) {
+    return ((bcd >> 4) * 10) + (bcd & 0x0F);
+}
 
 int main(void) {
   uart_setup();
@@ -141,36 +136,49 @@ int main(void) {
   // Foreground/Background or event-driven architecture
   while(1) {
     if (current_mode == 0) {
-      // Command Mode - wait for user commands
       if (message_ready) {
+        SerialPort_Send_String("command mode: \n");
         message_ready = 0; 
         process_command((char*)rx_buffer);
-      } 
+      }
       // Procesar comandos
       // - rtc_set_time(h, m, s)
       // - rtc_set_alarm(h, m, s)
       // - rtc_clear_alarm_flag()
       // - rtc_start_read()
-    } else {
-      if (timer_flag_1s) {
-            timer_flag_1s = 0;
-            if (alarm_active) {
-                // TODO: Enviar ALARMA por UART
-                alarm_count++;
+    }
 
-                if (alarm_count >= 5) {
-                    alarm_active = 0; // detener alarma
-                }
-            }
-            if (rtc_data_ready) {
-                // rtc_get_time(&h, &m, &s);
-                // TODO: Enviar hora por UART
-                rtc_start_read(); // Reiniciar lectura para el siguiente segundo
-            }
+    if (timer_flag_1s) {
+      timer_flag_1s = 0;
 
-        }
+      if (rtc_data_ready) {
+        SerialPort_Send_String("Time: ");
+        char time_str[16];
+
+        char debug_str[32];
+        sprintf(debug_str, "%02X:%02X:%02X  ", rtc_hours, rtc_minutes, rtc_seconds);
+        SerialPort_Send_String(debug_str);
+
+        // Convert BCD to decimal properly
+        uint8_t second = bcd_to_decimal(rtc_seconds);
+        uint8_t minute = bcd_to_decimal(rtc_minutes & 0x7F);
+        uint8_t hour   = bcd_to_decimal(rtc_hours & 0x3F);
+
+        sprintf(time_str, "%02d:%02d:%02d\n", hour, minute, second);
+        SerialPort_Send_String(time_str);
+        rtc_start_read(); // Reiniciar lectura para el siguiente segundo
+      }
     }
   }
 
   return 0;
 }
+
+      // if (alarm_active) {
+      //   // TODO: Enviar ALARMA por UART
+      //   alarm_count++;
+
+      //   if (alarm_count >= 5) {
+      //     alarm_active = 0; // detener alarma
+      //   }
+      // }
