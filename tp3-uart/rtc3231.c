@@ -8,6 +8,12 @@ volatile uint8_t rtc_data_ready = 0;
 volatile uint8_t alarm_active = 0;
 volatile uint8_t alarm_count = 0;
 
+/***************************************************************
+* Propósito de la función: Inicializa el módulo TWI (Two Wire Interface) para la comunicación con el RTC DS3231.
+* Parámetros de entrada (tipo, rango y formato): Ninguno
+* Parámetros de salida (tipo, rango y formato): Ninguno
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+***************************************************************/
 void rtc_init(void) {
     // Velocidad de 100kHz @ 8MHz
     TWSR = 0x00;
@@ -15,6 +21,12 @@ void rtc_init(void) {
     TWCR = (1 << TWEN);  // Enable TWI
 }
 
+/***************************************************************
+* Propósito de la función: Inicia la FSM para la lectura de fecha y hora desde el RTC DS3231.
+* Parámetros de entrada (tipo, rango y formato): Ninguno
+* Parámetros de salida (tipo, rango y formato): Ninguno
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+***************************************************************/
 void rtc_start_read_datetime(void) {
     if (rtc_state != RTC_IDLE) return;
     rtc_state = RTC_START;
@@ -23,6 +35,13 @@ void rtc_start_read_datetime(void) {
     TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 }
 
+/***************************************************************
+* Propósito de la función: Obtiene la fecha y hora actual del RTC
+* Parámetros de entrada (tipo, rango y formato): 
+*   - datetime: Puntero a estructura rtc_datetime_t donde se almacenará la fecha y hora
+* Parámetros de salida (tipo, rango y formato): Ninguno
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+***************************************************************/
 void rtc_get_datetime(rtc_datetime_t* datetime) {
     datetime->seconds = rtc_datetime.seconds;
     datetime->minutes = rtc_datetime.minutes;
@@ -33,6 +52,13 @@ void rtc_get_datetime(rtc_datetime_t* datetime) {
     datetime->year = rtc_datetime.year;
 }
 
+/***************************************************************
+* Propósito de la función: Configura la fecha y hora en el RTC DS3231.
+* Parámetros de entrada (tipo, rango y formato):
+*   - datetime: Puntero a struct rtc_datetime_t con la nueva fecha y hora a configurar
+* Parámetros de salida (tipo, rango y formato): Ninguno
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+***************************************************************/
 void rtc_set_datetime(rtc_datetime_t* datetime) {
     if (rtc_state != RTC_IDLE) return;
     rtc_current_op = RTC_OP_WRITE_DATETIME;
@@ -47,6 +73,13 @@ void rtc_set_datetime(rtc_datetime_t* datetime) {
     TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 }
 
+/***************************************************************
+* Propósito de la función: Configura la alarma en el RTC DS3231.
+* Parámetros de entrada (tipo, rango y formato):
+*   - datetime: Puntero a struct rtc_datetime_t con la hora de la alarma a configurar
+* Parámetros de salida (tipo, rango y formato): Ninguno
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+***************************************************************/
 void rtc_set_alarm(rtc_datetime_t* datetime) {
     if (rtc_state != RTC_IDLE) return;
     rtc_current_op = RTC_OP_WRITE_ALARM;
@@ -57,6 +90,12 @@ void rtc_set_alarm(rtc_datetime_t* datetime) {
     TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
 }
 
+/***************************************************************
+* Propósito de la función: Limpia el flag de alarma en el RTC DS3231.
+* Parámetros de entrada (tipo, rango y formato): Ninguno
+* Parámetros de salida (tipo, rango y formato): Ninguno
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+***************************************************************/
 void rtc_clear_alarm_flag(void) {
     if (rtc_state != RTC_IDLE) return;
     rtc_current_op = RTC_OP_CLEAR_ALARM;
