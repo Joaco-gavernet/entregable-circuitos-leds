@@ -48,9 +48,6 @@ int main(void) {
     timer1_init(); // Inicializar interrupción de 1s para tareas periódicas
     rtc_init(); // Inicializar RTC
 
-
-    SerialPort_Send_String("RTC3231 Clock:\n");
-    display_help();
     // Foreground/Background
     while(1) {
         if (message_ready) {

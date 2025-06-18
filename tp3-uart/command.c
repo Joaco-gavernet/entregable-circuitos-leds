@@ -1,4 +1,5 @@
 #include "command.h"
+#include "led.h"
 
 /***************************************************************
 * Propósito de la función: Configura una nueva fecha en el RTC, manteniendo la hora actual.
@@ -114,7 +115,7 @@ void display_help(void) {
     SerialPort_Send_String("  SET DATE dom,mo,yr - Set date (e.g., SET DATE 17,6,25)\n");
     SerialPort_Send_String("  SET TIME h,m,s - Set time (e.g., SET TIME 14,30,0)\n");
     SerialPort_Send_String("  SET ALARM h,m,s - Set alarm (e.g., SET ALARM 14,30,0)\n");
-    SerialPort_Send_String("  help - Show this help\n");
+    SerialPort_Send_String("  HELP - Show this help\n");
 }
 
 /***************************************************************
@@ -151,9 +152,11 @@ void process_command(char* command) {
     if (cr) *cr = '\0';
     
     if (strcmp(command, "ON") == 0) {
+        led_on();
         mode = 1;
         rtc_start_read_datetime();
     } else if (strcmp(command, "OFF") == 0) {
+        led_off();
         mode = 0;
     } else if (strcmp(command, "SET DATE") == 0) {
         SerialPort_Send_String("Usage: SET DATE dom,mo,yr (e.g., SET DATE 17,6,25)\n");
@@ -251,11 +254,11 @@ void process_command(char* command) {
         } else {
             SerialPort_Send_String("Invalid alarm format. Use: SET ALARM h,m,s\n");
         }
-    } else if (strcmp(command, "help") == 0) {
+    } else if (strcmp(command, "HELP") == 0) {
         display_help();
     } else {
         SerialPort_Send_String("Unknown command: '");
         SerialPort_Send_String(command);
-        SerialPort_Send_String("'\nType 'help' for available commands\n");
+        SerialPort_Send_String("'\nType 'HELP' for available commands\n");
     }
 } 

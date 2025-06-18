@@ -36,14 +36,12 @@ def read_serial(ser):
 def print_usage_examples():
     """Print usage examples for common commands"""
     print("\n=== Usage Examples ===")
-    print("1                    # Turn LED ON (starts datetime display)")
-    print("0                    # Turn LED OFF (stops datetime display)")
-    print("toggle               # Toggle LED state")
-    print("status               # Show LED status")
-    print("datetime             # Read and display date/time once")
-    print("setdate 2,17,6,25    # Set date: Tuesday, June 17, 2025")
-    print("settime 14,30,0      # Set time: 2:30:00 PM")
-    print("help                 # Show all commands")
+    print("ON                   # Display date and time")
+    print("OFF                  # Stop display date and time")
+    print("SET DATE 17,6,25     # Set date: June 17, 2025")
+    print("SET TIME 14,30,0     # Set time: 2:30:00 PM")
+    print("SET ALARM 14,30,0    # Set alarm: 2:30:00 PM")
+    print("HELP                 # Show all commands")
     print("=====================\n")
 
 def main():

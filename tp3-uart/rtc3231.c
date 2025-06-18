@@ -19,6 +19,10 @@ void rtc_init(void) {
     TWSR = 0x00;
     TWBR = 32;
     TWCR = (1 << TWEN);  // Enable TWI
+
+    // Assuming DS3231 INT pin is connected to Arduino digital pin 2 (INT0)
+    EICRA |= (1 << ISC01); // Trigger INT0 on falling edge
+    EIMSK |= (1 << INT0);  // Enable external interrupt INT0
 }
 
 /***************************************************************

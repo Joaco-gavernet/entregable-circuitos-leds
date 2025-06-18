@@ -9,7 +9,6 @@
 ISR(TWI_vect) {
     switch (rtc_state) {
         case RTC_START:
-            SerialPort_Send_String("RTC_START\n");
             TWDR = WRITE_ADDRESS;
             rtc_state = RTC_WRITE_ADDRESS;
             break;
@@ -31,6 +30,46 @@ ISR(TWI_vect) {
                 TWDR = 0x0E; // Dirección del registro CONTROL
                 rtc_state = RTC_WRITE_ALARM_CTRL_REG;
             }
+            break;
+
+        case RTC_WRITE_ALARM_REGISTER:
+            TWDR = rtc_write_datetime.seconds & 0x7F; // A1M1 = 0 (match seconds)
+            rtc_state = RTC_WRITE_ALARM_SECONDS;
+            break;
+
+        case RTC_WRITE_ALARM_SECONDS:
+            TWDR = rtc_write_datetime.minutes & 0x7F; // A1M2 = 0
+            rtc_state = RTC_WRITE_ALARM_MINUTES;
+            break;
+
+        case RTC_WRITE_ALARM_MINUTES:
+            TWDR = rtc_write_datetime.hours   & 0x7F; // A1M3 = 0
+            rtc_state = RTC_WRITE_ALARM_HOURS;
+            break;
+
+        case RTC_WRITE_ALARM_HOURS:
+            TWDR = 0x80; // A1M4 = 1, DY/DT = 0 → ignore date
+            rtc_state = RTC_WRITE_ALARM_DAY;
+            break;
+
+        case RTC_WRITE_ALARM_DAY:
+            rtc_current_op = RTC_OP_WRITE_ALARM_CTRL;
+            rtc_state = RTC_START;
+            TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
+            return;
+
+        case RTC_WRITE_CLEAR_ALARM:
+            TWDR = 0x00;  // Escribimos 0 en A1F (bit 0 del reg 0x0F)
+            rtc_state = RTC_DONE;
+            break;
+
+        case RTC_WRITE_ALARM_CTRL_REG:
+            TWDR = 0b00000101; // INTCN=1, A1IE=1
+            rtc_state = RTC_WRITE_ALARM_CTRL_VALUE;
+            break;
+
+        case RTC_WRITE_ALARM_CTRL_VALUE:
+            rtc_state = RTC_DONE;
             break;
 
         case RTC_WRITE_REGISTER:
@@ -90,36 +129,6 @@ ISR(TWI_vect) {
             TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);  // NACK
             return;
 
-        case RTC_WRITE_ALARM_REGISTER:
-            SerialPort_Send_String("RTC_WRITE_ALARM_REGISTER\n");
-            TWDR = rtc_write_datetime.seconds;
-            rtc_state = RTC_WRITE_ALARM_SECONDS;
-            break;
-
-        case RTC_WRITE_ALARM_SECONDS:
-            SerialPort_Send_String("RTC_WRITE_ALARM_SECONDS\n");
-            TWDR = rtc_write_datetime.minutes;
-            rtc_state = RTC_WRITE_ALARM_MINUTES;
-            break;
-
-        case RTC_WRITE_ALARM_MINUTES:
-            TWDR = rtc_write_datetime.hours;
-            rtc_state = RTC_WRITE_ALARM_HOURS;
-            break;
-
-        case RTC_WRITE_ALARM_HOURS:
-            SerialPort_Send_String("RTC_WRITE_ALARM_HOURS\n");
-            rtc_current_op = RTC_OP_WRITE_ALARM_CTRL;
-            rtc_state = RTC_START;
-            TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE); // nuevo START
-            return;
-
-        case RTC_WRITE_CLEAR_ALARM:
-            SerialPort_Send_String("RTC_WRITE_CLEAR_ALARM\n");
-            TWDR = 0x00;  // Escribimos 0 en A1F (bit 0 del reg 0x0F)
-            rtc_state = RTC_DONE;
-            break;
-
         case RTC_WRITE_SECONDS:
             TWDR = rtc_write_datetime.seconds;
             rtc_state = RTC_WRITE_MINUTES;
@@ -152,16 +161,6 @@ ISR(TWI_vect) {
 
         case RTC_WRITE_YEAR:
             TWDR = rtc_write_datetime.year;
-            rtc_state = RTC_DONE;
-            break;
-
-        case RTC_WRITE_ALARM_CTRL_REG:
-            SerialPort_Send_String("RTC_WRITE_ALARM_CTRL_REG\n");
-            TWDR = 0b00000101; // INTCN=1, A1IE=1
-            rtc_state = RTC_WRITE_ALARM_CTRL_VALUE;
-            break;
-
-        case RTC_WRITE_ALARM_CTRL_VALUE:
             rtc_state = RTC_DONE;
             break;
             
