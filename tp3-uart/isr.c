@@ -1,5 +1,11 @@
 #include "main.h"
 
+/***************************************************************
+* Propósito de la función: FSM encargada del protocolo I2C para comunicacion con el RTC-DS3231
+* Parámetros de entrada (tipo, rango y formato): Ninguno
+* Parámetros de salida (tipo, rango y formato): Ninguno
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+***************************************************************/
 ISR(TWI_vect) {
     switch (rtc_state) {
         case RTC_START:
@@ -170,12 +176,24 @@ ISR(TWI_vect) {
     TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
 }
 
+/***************************************************************
+* Propósito de la función: Maneja la interrupción externa INT0 cuando se activa la alarma del RTC.
+* Parámetros de entrada (tipo, rango y formato): Ninguno
+* Parámetros de salida (tipo, rango y formato): Ninguno
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+***************************************************************/
 ISR(INT0_vect) {
     alarm_active = 1;
     alarm_count = 0;
     rtc_clear_alarm_flag();  // Limpiamos A1F (bit 0 de reg 0x0F)
 }
 
+/***************************************************************
+* Propósito de la función: Maneja la interrupción de recepción UART, almacenando los caracteres recibidos en el buffer.
+* Parámetros de entrada (tipo, rango y formato): Ninguno
+* Parámetros de salida (tipo, rango y formato): Ninguno
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+***************************************************************/
 ISR(USART_RX_vect) {
   char c = SerialPort_Recive_Data();
 
@@ -190,6 +208,12 @@ ISR(USART_RX_vect) {
   }
 }
 
+/***************************************************************
+* Propósito de la función: Maneja la interrupción del Timer1 (1s) para tareas periódicas (ej: fecha y hora)
+* Parámetros de entrada (tipo, rango y formato): Ninguno
+* Parámetros de salida (tipo, rango y formato): Ninguno
+* Autor: Valeria Garcia, Joaquin Gavernet, Bautista Garcia
+***************************************************************/
 ISR(TIMER1_COMPA_vect) {
     timer_flag_1s = 1;
 }
