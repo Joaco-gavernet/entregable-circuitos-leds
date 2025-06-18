@@ -33,13 +33,27 @@ def read_serial(ser):
             except:
                 break
 
+def print_usage_examples():
+    """Print usage examples for common commands"""
+    print("\n=== Usage Examples ===")
+    print("1                    # Turn LED ON (starts datetime display)")
+    print("0                    # Turn LED OFF (stops datetime display)")
+    print("toggle               # Toggle LED state")
+    print("status               # Show LED status")
+    print("datetime             # Read and display date/time once")
+    print("setdate 2,17,6,25    # Set date: Tuesday, June 17, 2025")
+    print("settime 14,30,0      # Set time: 2:30:00 PM")
+    print("help                 # Show all commands")
+    print("=====================\n")
+
 def main():
     global current_mode
     
     try:
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=0.1)
         print(f"Connected to {SERIAL_PORT} at {BAUD_RATE} baud.")
-        print("Type commands and press Enter. Press Ctrl+C to exit.\n")
+        print("Type commands and press Enter. Press Ctrl+C to exit.")
+        print_usage_examples()
 
         # Start reading thread
         read_thread = threading.Thread(target=read_serial, args=(ser,), daemon=True)
@@ -61,6 +75,7 @@ def main():
 
     except serial.SerialException as e:
         print(f"[ERROR] Could not open serial port: {e}")
+        print(f"Please check if {SERIAL_PORT} is correct and the device is connected.")
     except KeyboardInterrupt:
         print("\nExiting.")
     finally:

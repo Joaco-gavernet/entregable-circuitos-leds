@@ -9,6 +9,16 @@
 #define READ_ADDRESS ((DS3231_ADDRESS << 1) | 1)
 #define WRITE_ADDRESS ((DS3231_ADDRESS << 1) | 0)
 
+// Unified datetime structure
+typedef struct {
+    uint8_t seconds;
+    uint8_t minutes;
+    uint8_t hours;
+    uint8_t day_of_week;
+    uint8_t day_of_month;
+    uint8_t month;
+    uint8_t year;
+} rtc_datetime_t;
 
 // Estados para la máquina de estados del driver
 typedef enum {
@@ -18,14 +28,22 @@ typedef enum {
     RTC_WRITE_REGISTER,
     RTC_REPEATED_START,
     RTC_READ_ADDRESS,
-    // lectura de hora
+    // lectura completa de fecha y hora
     RTC_READ_SECONDS,
     RTC_READ_MINUTES,
     RTC_READ_HOURS,
-    // escritura de hora
+    RTC_READ_DAY_OF_WEEK,
+    RTC_READ_DAY_OF_MONTH,
+    RTC_READ_MONTH,
+    RTC_READ_YEAR,
+    // escritura completa de fecha y hora
     RTC_WRITE_SECONDS,
     RTC_WRITE_MINUTES,
     RTC_WRITE_HOURS,
+    RTC_WRITE_DAY_OF_WEEK,
+    RTC_WRITE_DAY_OF_MONTH,
+    RTC_WRITE_MONTH,
+    RTC_WRITE_YEAR,
     // escritura de alarma
     RTC_WRITE_ALARM_REGISTER,
     RTC_WRITE_ALARM_SECONDS,
@@ -39,31 +57,29 @@ typedef enum {
 
 typedef enum {
     RTC_OP_NONE,
-    RTC_OP_READ,
-    RTC_OP_WRITE_TIME,
+    RTC_OP_READ_DATETIME,
+    RTC_OP_WRITE_DATETIME,
     RTC_OP_WRITE_ALARM,
-    RTC_OP_CLEAR_ALARM ,
+    RTC_OP_CLEAR_ALARM,
     RTC_OP_WRITE_ALARM_CTRL,
 } rtc_op_t;
 
-
 extern volatile rtc_op_t rtc_current_op;
 extern volatile rtc_state_t rtc_state;
-extern volatile uint8_t rtc_seconds, rtc_minutes, rtc_hours;
-extern volatile uint8_t rtc_write_h, rtc_write_m, rtc_write_s;
+extern volatile rtc_datetime_t rtc_datetime;
+extern volatile rtc_datetime_t rtc_write_datetime;
 extern volatile uint8_t rtc_data_ready;
 extern volatile uint8_t alarm_active;
 extern volatile uint8_t alarm_count;
 
 void rtc_init(void);
-void rtc_start_read(void);
-void rtc_get_time(uint8_t* h, uint8_t* m, uint8_t* s);
-void rtc_set_time(uint8_t h, uint8_t m, uint8_t s);
-void rtc_set_alarm(uint8_t h, uint8_t m, uint8_t s);
+void rtc_start_read_datetime(void);
+void rtc_get_datetime(rtc_datetime_t* datetime);
+void rtc_set_datetime(rtc_datetime_t* datetime);
+void rtc_set_alarm(rtc_datetime_t* datetime);
 void rtc_clear_alarm_flag(void);
 void rtc_write_alarm_ctrl(void);
 void rtc_read_alarm_ctrl(void);
-
 
 #endif
 
