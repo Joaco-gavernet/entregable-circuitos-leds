@@ -34,7 +34,7 @@ void ext_int0_init(void) {
 
 // === UART para comunicación con PC ===
 void uart_setup(void) {
-    SerialPort_Init(0x33); // 9600 baudios
+    SerialPort_Init(0x67); // 9600 baudios
     SerialPort_RX_Enable();
     SerialPort_RX_Interrupt_Enable();
     SerialPort_TX_Enable();
