@@ -55,13 +55,13 @@ int main(void) {
             process_command((char*)rx_buffer);
         }
         if (timer_flag_1s) { // Interrupciones periodicas(1s)
+            if (alarm_active) handle_alarm();
             timer_flag_1s = 0;
             if (rtc_data_ready && mode == 1) {
                 display_datetime();
                 rtc_start_read_datetime(); // Continue reading for next second
             }
         }
-        if (alarm_active) handle_alarm();
     }
 
     return 0;
