@@ -3,7 +3,7 @@ import threading
 import time
 
 # Replace this with the correct COM port or /dev/ttyUSBx
-SERIAL_PORT = "/dev/tty.usbserial-2130"          # For Windows (e.g., COM3), or "/dev/ttyUSB0" for Linux
+SERIAL_PORT = "/dev/tty.usbserial-1130"          # For Windows (e.g., COM3), or "/dev/ttyUSB0" for Linux
 BAUD_RATE = 9600               # Must match UBRR config (e.g., 9600 bps)
 
 # Global state variables
@@ -56,7 +56,7 @@ def main():
         print(f"Connected to {SERIAL_PORT} at {BAUD_RATE} baud.")
         print("Type color commands and press Enter. Press Ctrl+C to exit.")
         print("Use the potentiometer to adjust brightness (0-100%)")
-        print_usage_examples()
+        # print_usage_examples()
 
         # Start reading thread
         read_thread = threading.Thread(target=read_serial, args=(ser,), daemon=True)

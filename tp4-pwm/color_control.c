@@ -71,14 +71,13 @@ void color_control_set_color(uint8_t command) {
 }
 
 void color_control_apply_colors(void) {
-    // Aplicar valores RGB con brillo a los PWM
-    // PB1 = Rojo, PB2 = Verde, PB5 = Azul
-    uint8_t red_value = (current_color.red * current_brightness) / 255;
-    uint8_t green_value = (current_color.green * current_brightness) / 255;
-    uint8_t blue_value = (current_color.blue * current_brightness) / 255;
+    uint8_t red_value = (((float)current_brightness/255) * current_color.red);
+    uint8_t green_value = (((float)current_brightness/255) * current_color.green);
+    uint8_t blue_value = (((float)current_brightness/255) * current_color.blue);
+
     
-    timer1_pwm_set(1, green_value);   // PB1 - Rojo
-    timer1_pwm_set(2, red_value); // PB2 - Verde
+    timer1_pwm_set(1, green_value);   // PB1 - Verde
+    timer1_pwm_set(2, red_value); // PB2 - Rojo
     soft_pwm_set(blue_value);       // PB5 - Azul
 }
 

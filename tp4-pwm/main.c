@@ -1,8 +1,9 @@
 #include "main.h"
 
+
 int main() {
     uint16_t adc_value;
-    uint8_t brightness;
+    uint16_t brightness;
     char uart_command;
     
     // Inicializar módulos
@@ -18,8 +19,10 @@ int main() {
 
     while (1) {
         // Leer potenciómetro para ajustar brillo
+        char buffer[10];
         adc_value = adc_read(3);
-        brightness = (adc_value * 255) / 1023;
+        // Calculo en float ya que debemos conocer fraccion exacta de potenciometro
+        brightness = (uint16_t)(((float)adc_value/1023) * 255);
         
         // Aplicar brillo y colores actuales
         color_control_set_brightness(brightness);
@@ -31,7 +34,10 @@ int main() {
             
             if (uart_command == 'm' || uart_command == 'M') {
                 color_control_print_menu();
-            } else {
+            } else if (uart_command == '\r' || uart_command == '\n') {
+                continue;
+            }
+            else {
                 color_control_set_color(uart_command);
             }
         }

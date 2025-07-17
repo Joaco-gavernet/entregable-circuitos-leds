@@ -10,14 +10,12 @@
 // }
 
 void SerialPort_Init(uint8_t config){
-	// configuracion que anda para mandar string por serialport
-	// TO-DO: chequear porque no anda send_data()
-	UCSR0B = (1<<TXEN0); 
+	UCSR0B = (1<<TXEN0) | (1<<RXEN0); 
 	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
 	UBRR0H = 0;
 	UBRR0L = 103;
 
-	// UCSR0B |= (1<<RXEN0);
+
 	// DDRB = 0xFF;
 }
 
