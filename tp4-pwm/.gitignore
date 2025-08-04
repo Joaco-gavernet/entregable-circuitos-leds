@@ -1,0 +1,22 @@
+# Ignore makefile
+makefile
+
+# Ignore markdown files except README
+*.md
+!README.md
+
+# Ignore build artifacts
+*.o
+*.elf
+*.hex
+*.d
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS files
+.DS_Store
+Thumbs.db 
