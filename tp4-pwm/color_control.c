@@ -75,7 +75,6 @@ void color_control_apply_colors(void) {
     uint8_t green_value = (((float)current_brightness/255) * current_color.green);
     uint8_t blue_value = (((float)current_brightness/255) * current_color.blue);
 
-    
     timer1_pwm_set(1, green_value);   // PB1 - Verde
     timer1_pwm_set(2, red_value); // PB2 - Rojo
     soft_pwm_set(blue_value);       // PB5 - Azul

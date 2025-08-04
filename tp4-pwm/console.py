@@ -3,7 +3,7 @@ import threading
 import time
 
 # Replace this with the correct COM port or /dev/ttyUSBx
-SERIAL_PORT = "/dev/tty.usbserial-1130"          # For Windows (e.g., COM3), or "/dev/ttyUSB0" for Linux
+SERIAL_PORT = "COM5"          # For Windows (e.g., COM3), or "/dev/ttyUSB0" for Linux
 BAUD_RATE = 9600               # Must match UBRR config (e.g., 9600 bps)
 
 # Global state variables

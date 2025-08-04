@@ -6,8 +6,8 @@ void adc_init(void) {
 }
 
 uint16_t adc_read(uint8_t channel) {
-    ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);
-    ADCSRA |= (1 << ADSC);
-    while (ADCSRA & (1 << ADSC));
+    ADMUX = (ADMUX & 0xF0) | (channel & 0x0F); // Seleccionar canal
+    ADCSRA |= (1 << ADSC); // Iniciar conversión
+    while (ADCSRA & (1 << ADSC)); // Polling para esperar a que la conversión termine
     return ADC;
 } 

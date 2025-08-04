@@ -1,22 +1,10 @@
 #include "serialPort.h"
 
-// void SerialPort_Init(uint8_t config){
-// 	// config = 0x33 ==> Configuro UART 9600bps, 8 bit data, 1 stop @ F_CPU = 8MHz.
-// 	// config = 0x25 ==> Configuro UART 9600bps, 8 bit data, 1 stop @ F_CPU = 4Hz.
-// 	UCSR0B = 0;
-// 	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
-// 	UBRR0H = (unsigned char)(config>>8);
-// 	UBRR0L = (unsigned char)config;
-// }
-
-void SerialPort_Init(uint8_t config){
+void SerialPort_Init(void){
 	UCSR0B = (1<<TXEN0) | (1<<RXEN0); 
 	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);
 	UBRR0H = 0;
 	UBRR0L = 103;
-
-
-	// DDRB = 0xFF;
 }
 
 

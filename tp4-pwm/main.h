@@ -11,8 +11,11 @@
 #include "soft_pwm.h"
 #include "adc.h"
 #include "color_control.h"
+#include "serialPort.h"
 
 // Definiciones globales
+#ifndef F_CPU
 #define F_CPU 16000000UL
+#endif
 
 #endif // MAIN_H
